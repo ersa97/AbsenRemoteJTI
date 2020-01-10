@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "103321958262",
+    "firebase_url": "https://absenjti.firebaseio.com",
+    "project_id": "absenjti",
+    "storage_bucket": "absenjti.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:103321958262:android:cfcf90d592dbe4e2206c57",
+        "android_client_info": {
+          "package_name": "com.e.absenremotejti"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "103321958262-j6tsmbjqf4c74t29up78u1bmj466bndn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQBkFPPwdL0Lp0C4D4hfvPr5DeRjz8G_c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "103321958262-j6tsmbjqf4c74t29up78u1bmj466bndn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
