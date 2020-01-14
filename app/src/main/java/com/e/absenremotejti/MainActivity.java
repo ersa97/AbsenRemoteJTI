@@ -12,9 +12,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -42,8 +44,10 @@ public class MainActivity extends AppCompatActivity {
     Button buttonSignIn;
     EditText editTextLocation;
 
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private CollectionReference ListRef = db.collection("Employee_List");
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    String _Id, _Name;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,18 +60,12 @@ public class MainActivity extends AppCompatActivity {
         buttonSignIn = findViewById(R.id.btn_sign_in);
         editTextLocation = findViewById(R.id.text_input_location_employee);
 
+        _Id = editTextId.getText().toString();
+
         buttonVerify.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ListRef.whereEqualTo("Id",editTextId).get()
-                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                for (DocumentSnapshot snapshot : task.getResult()){
-                                    textViewName.setText(snapshot.get("Name").toString());
-                                }
-                            }
-                        });
+               search();
             }
         });
 
@@ -88,6 +86,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    public void search(){
+        db.collection("Employee_List").whereEqualTo("Id", _Id).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                DocumentReference reference = null;
+                for (DocumentSnapshot doc : task.getResult()) {
+
+                    reference = doc.getReference();
+
+                    _Name = doc.getString("Name");
+                    textViewName.setText(_Name);
+                }
+            }
+        });
     }
 
     public void upload(final String Id, final String Name, final DateFormat dateFormat, final String Location){
