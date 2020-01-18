@@ -11,6 +11,12 @@ public class attendance {
     String Location;
     Timestamp Date;
 
+
+    public attendance(String id, String name, DateFormat dateFormat, String location){
+
+    }
+
+
     public String getLocation(){
         return Location;
     }
@@ -50,13 +56,8 @@ public class attendance {
         Location = location;
     }
 
-    public attendance(String id, String name, DateFormat dateFormat, String location){
 
-    }
 
-    public attendance(){
-
-    }
 
 
 }

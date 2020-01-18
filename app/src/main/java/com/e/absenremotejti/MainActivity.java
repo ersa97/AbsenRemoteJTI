@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,9 +13,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -23,6 +26,9 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity {
@@ -46,7 +52,8 @@ public class MainActivity extends AppCompatActivity {
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    String _Id, _Name;
+    CollectionReference reference = db.collection("Employee_List");
+
 
 
     @Override
@@ -60,12 +67,22 @@ public class MainActivity extends AppCompatActivity {
         buttonSignIn = findViewById(R.id.btn_sign_in);
         editTextLocation = findViewById(R.id.text_input_location_employee);
 
-        _Id = editTextId.getText().toString();
 
         buttonVerify.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               search();
+                final String id = editTextId.getText().toString();
+                db.collection("Employee_List").whereEqualTo("Id", id).get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (DocumentSnapshot snapshot : task.getResult()) {
+                                        textViewName.setText(snapshot.get("Name").toString());
+                                    }
+                                }
+                            }
+                        });
             }
         });
 
@@ -82,32 +99,27 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Please fill in the required information", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                upload(Id, Name, dateFormat, Location);
+                Map<String, Object> data = new HashMap<>();
+                data.put("Id", Id);
+                data.put("Name", Name);
+                data.put("Date", new Timestamp(new Date()));
+                data.put("Location", Location);
+
+                db.collection("Employee_Attendance")
+                        .add(data)
+                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                            @Override
+                            public void onSuccess(DocumentReference documentReference) {
+                                Toast.makeText(MainActivity.this, "Attendance Recorded", Toast.LENGTH_SHORT).show();
+                            }
+                        });
             }
         });
 
     }
 
-    public void search(){
-        db.collection("Employee_List").whereEqualTo("Id", _Id).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                DocumentReference reference = null;
-                for (DocumentSnapshot doc : task.getResult()) {
 
-                    reference = doc.getReference();
 
-                    _Name = doc.getString("Name");
-                    textViewName.setText(_Name);
-                }
-            }
-        });
-    }
-
-    public void upload(final String Id, final String Name, final DateFormat dateFormat, final String Location){
-        CollectionReference reference = FirebaseFirestore.getInstance().collection("Employee_Attendance");
-        reference.add(new attendance(Id, Name, dateFormat, Location));
-    }
 
     @Override
     public void onBackPressed() {
